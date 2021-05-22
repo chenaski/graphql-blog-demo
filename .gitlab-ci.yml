@@ -1,7 +1,7 @@
 stages:
   - lint
 
-eslint:
+lint:
   stage: lint
   allow_failure: true
   variables:
