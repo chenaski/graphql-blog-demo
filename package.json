@@ -6,6 +6,7 @@
     "dev": "next",
     "build": "next build",
     "start": "next start",
+    "lint": "npx prettier --single-quote -uc '{apollo,components,lib,pages,prisma}/**/*'",
     "generate": "npm -s run generate:prisma && npm -s run generate:nexus",
     "generate:prisma": "prisma generate",
     "generate:nexus": "ts-node --transpile-only -P nexus.tsconfig.json pages/api"
