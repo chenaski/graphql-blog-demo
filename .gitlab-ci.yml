@@ -3,6 +3,7 @@ stages:
 
 eslint:
   stage: lint
+  allow_failure: true
   variables:
     NODE_VERSION: 14.17.0
   script:
