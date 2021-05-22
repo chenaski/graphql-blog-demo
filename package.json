@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "npx prettier --single-quote -uc '{apollo,components,lib,pages,prisma}/**/*'",
     "format": "npx prettier --single-quote -ucw '{apollo,components,lib,pages,prisma}/**/*'",
+    "check-types": "npx tsc --noEmit",
     "generate": "npm -s run generate:prisma && npm -s run generate:nexus",
     "generate:prisma": "prisma generate",
     "generate:nexus": "ts-node --transpile-only -P nexus.tsconfig.json pages/api"
