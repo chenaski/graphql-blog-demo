@@ -31,12 +31,13 @@ deploy:
   script:
     - apk --update add openssh-client rsync
     - eval $(ssh-agent -s)
-    - echo $SSH_PRIVATE_KEY | ssh-add -
+    - echo "$SSH_PRIVATE_KEY" | ssh-add -
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
     - rsync -a --progress --human-readable --delete
-      --exclude-from '.gitignore'
-      --exclude '.gitignore'
-      --exclude '.git'
-      ./.next/* deploy@35.223.84.150:~/realworld
+      --include ".next"
+      --exclude-from ".gitignore"
+      --exclude ".gitignore"
+      --exclude ".git"
+      . deploy@35.223.84.150:~/realworld
