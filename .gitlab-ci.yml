@@ -3,22 +3,21 @@ stages:
   - build
   - deploy
 
+image: node:14-alpine
+
 lint:
-  image: node:14-alpine
   stage: lint
   allow_failure: true
   script:
     - npm run lint
 
 check-types:
-  image: node:14-alpine
   stage: lint
   script:
     - npm install
     - npm run check-types
 
 build:
-  image: node:14-alpine
   stage: build
   script:
     - npm install
@@ -28,9 +27,9 @@ build:
       - .next
 
 deploy:
-  image: node:14-slim
   stage: deploy
   script:
+    - apk --update add openssh-client rsync
     - eval $(ssh-agent -s)
     - echo $SSH_PRIVATE_KEY | ssh-add -
     - mkdir -p ~/.ssh
