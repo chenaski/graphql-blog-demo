@@ -25,7 +25,7 @@ build:
     - npm run build
   artifacts:
     paths:
-      - build/
+      - .next
 
 deploy:
   image: node:14-slim
@@ -40,4 +40,4 @@ deploy:
       --exclude-from '.gitignore'
       --exclude '.gitignore'
       --exclude '.git'
-      ./build/* deploy@35.223.84.150:~/realworld
+      ./.next/* deploy@35.223.84.150:~/realworld
