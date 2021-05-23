@@ -7,6 +7,11 @@ datasource db {
   provider = "postgresql"
 }
 
+// datasource db {
+//   provider = "sqlite"
+//   url      = "file:./dev.db"
+// }
+
 model User {
   email String  @unique
   id    Int     @id @default(autoincrement())
