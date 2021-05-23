@@ -35,10 +35,17 @@ deploy:
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+    - touch prisma/.env
+    - echo "DATABASE_URL=$DATABASE_URL" > prisma/.env
     - rsync -a --progress --human-readable --delete
       --include ".next"
+      --include "prisma/.env"
       --exclude-from ".gitignore"
       --exclude ".gitignore"
       --exclude ".git"
       . deploy@$HOST:~/realworld
-    - ssh deploy@$HOST "pushd ~/realworld && npm install --production && popd && pm2 restart ecosystem.config.js"
+    - ssh deploy@$HOST "pushd ~/realworld &&
+      npm install --production &&
+      npx prisma migrate deploy &&
+      popd &&
+      pm2 restart ecosystem.config.js"
