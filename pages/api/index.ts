@@ -1,4 +1,5 @@
 import { ApolloServer } from 'apollo-server-micro';
+import cors from 'micro-cors';
 import { DateTimeResolver } from 'graphql-scalars';
 import {
   asNexusMethod,
@@ -183,6 +184,16 @@ export const config = {
   },
 };
 
-export default new ApolloServer({ schema }).createHandler({
-  path: '/api',
+const microCors = cors();
+const apolloServer = new ApolloServer({ schema });
+
+export default microCors((req, res) => {
+  if (req.method === 'OPTIONS') {
+    res.end();
+    return false;
+  }
+
+  return apolloServer.createHandler({
+    path: '/api',
+  })(req, res);
 });

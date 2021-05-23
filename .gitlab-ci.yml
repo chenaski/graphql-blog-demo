@@ -29,7 +29,7 @@ build:
 deploy:
   stage: deploy
   script:
-    - apk --update add openssh-client rsync
+    - apk --update add openssh-client rsync git
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | ssh-add -
     - mkdir -p ~/.ssh
@@ -44,8 +44,10 @@ deploy:
       --exclude ".gitignore"
       --exclude ".git"
       . deploy@$HOST:~/realworld
-    - ssh deploy@$HOST "pushd ~/realworld &&
+    - BACKEND_VERSION=$(git rev-parse --short HEAD)
+    - ssh deploy@$HOST -o SendEnv="BACKEND_VERSION" "pushd ~/realworld &&
       npm install --production &&
+      npx prisma generate &&
       npx prisma migrate deploy &&
       popd &&
-      BACKEND_VERSION=$(git rev-parse --short HEAD) pm2 restart ecosystem.config.js"
+      BACKEND_VERSION=$BACKEND_VERSION pm2 restart ecosystem.config.js"
