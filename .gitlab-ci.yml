@@ -21,7 +21,7 @@ build:
   stage: build
   script:
     - npm install
-    - NEXT_PUBLIC_HOST=http://$HOST:3000 NEXT_PUBLIC_FRONTEND_VERSION=$(git rev-parse --short HEAD) npm run build
+    - NEXT_PUBLIC_HOST=http://$HOST:3000 NEXT_PUBLIC_FRONTEND_VERSION="$CI_COMMIT_SHORT_SHA" npm run build
   artifacts:
     paths:
       - .next
@@ -36,18 +36,19 @@ deploy:
     - chmod 700 ~/.ssh
     - echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
     - touch prisma/.env
+    - echo "BACKEND_VERSION=$CI_COMMIT_SHORT_SHA" > .env
     - echo "DATABASE_URL=$DATABASE_URL" > prisma/.env
     - rsync -a --progress --human-readable --delete
       --include ".next"
+      --include ".env"
       --include "prisma/.env"
       --exclude-from ".gitignore"
       --exclude ".gitignore"
       --exclude ".git"
       . deploy@$HOST:~/realworld
-    - BACKEND_VERSION=$(git rev-parse --short HEAD)
-    - ssh deploy@$HOST -o SendEnv="BACKEND_VERSION" "pushd ~/realworld &&
+    - ssh deploy@$HOST "pushd ~/realworld &&
       npm install --production &&
       npx prisma generate &&
       npx prisma migrate deploy &&
       popd &&
-      BACKEND_VERSION=$BACKEND_VERSION pm2 restart ecosystem.config.js"
+      pm2 restart ecosystem.config.js"

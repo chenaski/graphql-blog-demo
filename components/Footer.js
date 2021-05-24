@@ -1,4 +1,5 @@
 const Footer = () => {
+  console.log(process.env);
   const frontendVersion =
     process.env.NEXT_PUBLIC_FRONTEND_VERSION ?? 'undefined';
   const backendVersion =
