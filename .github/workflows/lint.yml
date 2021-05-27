@@ -14,10 +14,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: "prettier"
+      - name: "Check if files are formatted with prettier"
         run: |
           npm run lint
-      - name: "types"
+      - name: "Check types"
         run: |
           npm install --no-save typescript
           npm run check-types
