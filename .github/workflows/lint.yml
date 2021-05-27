@@ -19,4 +19,5 @@ jobs:
           npm run lint
       - name: "types"
         run: |
+          npm install --no-save typescript
           npm run check-types
