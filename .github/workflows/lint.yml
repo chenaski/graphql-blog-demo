@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  prettier:
+  lint:
     runs-on: ubuntu-latest
 
     container:
@@ -17,3 +17,6 @@ jobs:
       - name: "prettier"
         run: |
           npm run lint
+      - name: "types"
+        run: |
+          npm run check-types
