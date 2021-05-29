@@ -15,14 +15,69 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
       - name: "Install dependencies"
         run: |
           npm ci
-          NEXT_PUBLIC_HOST=http://$HOST:3000 NEXT_PUBLIC_FRONTEND_VERSION=$GITHUB_SHA npm run build
+          NEXT_PUBLIC_HOST=http://$HOST:3000 NEXT_PUBLIC_FRONTEND_VERSION=$APP_VERSION npm run build
         env:
           HOST: ${{ secrets.HOST }}
+          APP_VERSION: ${{ env.GITHUB_SHA }}
+
       - name: "Archive build"
         uses: actions/upload-artifact@v2
         with:
           name: build
           path: .next
+
+  deploy:
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    container:
+      image: node:14-alpine
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: "Download artifact"
+        uses: actions/download-artifact@v2
+        with:
+          name: build
+          path: .next
+
+      - name: "Setup OS"
+        run: |
+          apk --update add openssh-client rsync
+
+      - name: "Setup SSH"
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+
+      - name: "Create env files"
+        run: |
+          echo "BACKEND_VERSION=$APP_VERSION" > .env
+          echo "DATABASE_URL=$DATABASE_URL" > prisma/.env
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          APP_VERSION: ${{ env.GITHUB_SHA }}
+
+      - name: "Copy files to the server"
+        run: |
+          rsync -a --progress --human-readable --delete --include ".next" --include ".env" --include "prisma/.env" --exclude-from ".gitignore" --exclude ".gitignore" --exclude ".git" . deploy@$HOST:~/realworld
+        env:
+          HOST: ${{ secrets.HOST }}
+
+      - name: "Start application"
+        run: |
+          ssh deploy@$HOST "pushd ~/realworld && \
+            npm install --production && \
+            npx prisma generate && \
+            npx prisma migrate deploy && \
+            popd && \
+            pm2 restart ecosystem.config.js"
+        env:
+          HOST: ${{ secrets.HOST }}
