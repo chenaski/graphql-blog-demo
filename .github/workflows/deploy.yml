@@ -22,7 +22,7 @@ jobs:
           NEXT_PUBLIC_HOST=http://$HOST:3000 NEXT_PUBLIC_FRONTEND_VERSION=$APP_VERSION npm run build
         env:
           HOST: ${{ secrets.HOST }}
-          APP_VERSION: ${{ env.GITHUB_SHA }}
+          APP_VERSION: $GITHUB_SHA
 
       - name: "Archive build"
         uses: actions/upload-artifact@v2
@@ -63,7 +63,7 @@ jobs:
           echo "DATABASE_URL=$DATABASE_URL" > prisma/.env
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          APP_VERSION: ${{ env.GITHUB_SHA }}
+          APP_VERSION: $GITHUB_SHA
 
       - name: "Copy files to the server"
         run: |
